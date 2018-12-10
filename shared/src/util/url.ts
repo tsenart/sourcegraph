@@ -60,7 +60,7 @@ export interface ModeSpec {
     mode: string
 }
 
-export type BlobViewState = 'references' | 'discussions' | 'impl'
+export type BlobViewState = 'def' | 'references' | 'discussions' | 'impl'
 
 export interface ViewStateSpec {
     /**
