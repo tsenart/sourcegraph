@@ -374,15 +374,16 @@ type SiteConfiguration struct {
 	PrivateArtifactRepoURL            string                       `json:"privateArtifactRepoURL,omitempty"`
 	PrivateArtifactRepoUsername       string                       `json:"privateArtifactRepoUsername,omitempty"`
 	RepoListUpdateInterval            int                          `json:"repoListUpdateInterval,omitempty"`
-	ReposList                         []*Repository                `json:"repos.list,omitempty"`
-	ReviewBoard                       []*ReviewBoard               `json:"reviewBoard,omitempty"`
-	SearchIndexEnabled                *bool                        `json:"search.index.enabled,omitempty"`
-	SiteID                            string                       `json:"siteID,omitempty"`
-	TlsLetsencrypt                    string                       `json:"tls.letsencrypt,omitempty"`
-	TlsCert                           string                       `json:"tlsCert,omitempty"`
-	TlsKey                            string                       `json:"tlsKey,omitempty"`
-	UpdateChannel                     string                       `json:"update.channel,omitempty"`
-	UseJaeger                         bool                         `json:"useJaeger,omitempty"`
+	// QUESTION(tsenart): Should we remove ReposList from here too?
+	ReposList          []*Repository  `json:"repos.list,omitempty"`
+	ReviewBoard        []*ReviewBoard `json:"reviewBoard,omitempty"`
+	SearchIndexEnabled *bool          `json:"search.index.enabled,omitempty"`
+	SiteID             string         `json:"siteID,omitempty"`
+	TlsLetsencrypt     string         `json:"tls.letsencrypt,omitempty"`
+	TlsCert            string         `json:"tlsCert,omitempty"`
+	TlsKey             string         `json:"tlsKey,omitempty"`
+	UpdateChannel      string         `json:"update.channel,omitempty"`
+	UseJaeger          bool           `json:"useJaeger,omitempty"`
 }
 
 // SlackNotificationsConfig description: Configuration for sending notifications to Slack.
