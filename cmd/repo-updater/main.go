@@ -68,9 +68,6 @@ func main() {
 	// Sync relies on access to frontend, so wait until it has started up.
 	api.WaitForFrontend(ctx)
 
-	// Repos List syncing thread
-	go repos.RunRepositorySyncWorker(ctx)
-
 	// Repos purging thread
 	go repos.RunRepositoryPurgeWorker(ctx)
 

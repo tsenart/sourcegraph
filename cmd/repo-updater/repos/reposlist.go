@@ -719,61 +719,6 @@ func (r *repoList) updateSource(source string, newList sourceRepoList) (enqueued
 // Scheduler schedules repo updates.
 var Scheduler = newUpdateScheduler()
 
-// RunRepositorySyncWorker runs the worker that syncs repositories from external code hosts to Sourcegraph
-func RunRepositorySyncWorker(ctx context.Context) {
-	var shutdownPreviousScheduler context.CancelFunc
-	newSchedulerRunning, oldSchedulerRunning := false, false
-	conf.Watch(func() {
-		c := conf.Get()
-
-		if conf.UpdateScheduler2Enabled() {
-			schedScale.Set(0) // this metric doesn't apply to the new scheduler; remove it when old scheduler is removed
-			if oldSchedulerRunning {
-				log15.Info("shutting down old scheduler")
-				shutdownPreviousScheduler()
-				oldSchedulerRunning = false
-			}
-			if c.DisableAutoGitUpdates {
-				if newSchedulerRunning {
-					log15.Info("shutting down new scheduler (auto git updates disabled)")
-					shutdownPreviousScheduler()
-					newSchedulerRunning = false
-				}
-			} else {
-				if !newSchedulerRunning {
-					log15.Info("starting new scheduler")
-					ctx2, cancel := context.WithCancel(ctx)
-					Scheduler.run(ctx2)
-					shutdownPreviousScheduler = cancel
-					newSchedulerRunning = true
-				}
-				_, newMap := updateConfig(ctx, c.ReposList)
-				Scheduler.updateSource("internalConfig", newMap)
-				return
-			}
-		} else {
-			repos.mu.Lock()
-			repos.autoUpdatesDisabled = c.DisableAutoGitUpdates
-			repos.mu.Unlock()
-
-			if newSchedulerRunning {
-				log15.Info("shutting down new scheduler")
-				shutdownPreviousScheduler()
-				newSchedulerRunning = false
-			}
-			if !oldSchedulerRunning {
-				log15.Info("starting old scheduler")
-				ctx2, cancel := context.WithCancel(ctx)
-				go repos.updateLoop(ctx2)
-				shutdownPreviousScheduler = cancel
-				oldSchedulerRunning = true
-			}
-			newList, _ := updateConfig(ctx, c.ReposList)
-			repos.updateSource("internalConfig", newList)
-		}
-	})
-}
-
 // updateConfig responds to changes in the configured list of repositories;
 // this is specifically the list of repositories directly configured, as opposed
 // to repositories found by looking up keys from various services.
