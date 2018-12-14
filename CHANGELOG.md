@@ -47,7 +47,23 @@ All notable changes to Sourcegraph are documented in this file.
 - The `siteID` site configuration option was removed because it is no longer needed. If you previously specified this in site configuration, a new, random site ID will be generated upon server startup. You can safely remove the existing `siteID` value from your site configuration after upgrading.
 - The **Info** panel was removed. The information it presented can be viewed in the hover.
 
-### Removed
+#### Top level `repos.list` removed from site configuration options
+
+The top-level `repos.list` site configuration was removed in favour of each code-host's equivalent options,
+now configured via the new _External Services UI_ available at `/site-admin/external-services`.
+
+Equivalent options in code hosts configuration **supported today**:
+
+- Github via [`github.repos`](https://docs.sourcegraph.com/admin/site_config/all#repos-array)
+- Gitlab via [`gitlab.projectQuery`](https://docs.sourcegraph.com/admin/site_config/all#projectquery-array)
+- Phabricator via [`phabricator.repos`](https://docs.sourcegraph.com/admin/site_config/all#phabricator-array)
+
+Supported [🔜](https://github.com/sourcegraph/sourcegraph/issues/1324):
+
+- AWS Code Commit via `awsCodeCommit.repos`
+- Gitlab via `gitlab.repos`
+- Bitbucket Server via `bitbucketServer.repos`
+- Gitolite via `gitolite.repos`
 
 ## 2.13.6
 
