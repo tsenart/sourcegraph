@@ -25,18 +25,14 @@ import { getModeFromPath } from '../../../../../shared/src/languages'
 import { PlatformContextProps } from '../../../../../shared/src/platform/context'
 import {
     FileSpec,
+    PositionSpec,
     RepoSpec,
     ResolvedRevSpec,
     RevSpec,
     toRootURI,
     toURIWithPath,
 } from '../../../../../shared/src/util/url'
-import {
-    createLSPFromExtensions,
-    JumpURLLocation,
-    lspViaAPIXlang,
-    toTextDocumentIdentifier,
-} from '../../shared/backend/lsp'
+import { createLSPFromExtensions, lspViaAPIXlang, toTextDocumentIdentifier } from '../../shared/backend/lsp'
 import { ButtonProps, CodeViewToolbar } from '../../shared/components/CodeViewToolbar'
 import { sourcegraphUrl, useExtensions } from '../../shared/util/context'
 import { bitbucketServerCodeHost } from '../bitbucket/code_intelligence'
@@ -158,8 +154,8 @@ export interface CodeHost {
      */
     getGlobalDebugMount?: MountGetter
 
-    /** Build the J2D url from the location. */
-    buildJumpURLLocation?: (def: JumpURLLocation) => string
+    /** Construct the URL to the specified file. */
+    urlToFile?: (location: RepoSpec & RevSpec & FileSpec & PositionSpec & { part?: DiffPart }) => string
 }
 
 export interface FileInfo {
@@ -238,15 +234,10 @@ function initCodeIntelligence(
 
     // TODO!(sqs): use this for url generation
     //
-    // const fetchJumpURL = createJumpURLFetcher(
-    //     simpleProviderFns.fetchDefinition,
-    //     codeHost.buildJumpURLLocation || toPrettyBlobURL
-    // )
+    // const fetchJumpURL = createJumpURLFetcher(simpleProviderFns.fetchDefinition, codeHost.urlToFile || toPrettyBlobURL)
 
     const containerComponentUpdates = new Subject<void>()
-
     if (extensionsController) {
-        // TODO!(sqs): historyi
         registerHoverContributions({ extensionsController, history: H.createBrowserHistory() })
     }
 

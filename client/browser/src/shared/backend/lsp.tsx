@@ -235,13 +235,12 @@ export function fetchJumpURL(
     )
 }
 
-export type JumpURLLocation = RepoSpec & RevSpec & ResolvedRevSpec & FileSpec & PositionSpec & { part?: DiffPart }
 export function createJumpURLFetcher(
     fetchDefinition: SimpleProviderFns['fetchDefinition'],
-    buildURL: (pos: JumpURLLocation) => string
+    buildURL: (pos: RepoSpec & RevSpec & FileSpec & PositionSpec & { part?: DiffPart }) => string
 ): JumpURLFetcher<RepoSpec & RevSpec & FileSpec & ResolvedRevSpec> {
-    return ({ line, character, part, commitID, repoName, ...rest }) =>
-        fetchDefinition({ ...rest, commitID, repoName, position: { line, character } }).pipe(
+    return ({ line, character, part, repoName, ...rest }) =>
+        fetchDefinition({ ...rest, repoName, position: { line, character } }).pipe(
             map(def => {
                 const defArray = Array.isArray(def) ? def : [def]
                 def = defArray[0]
@@ -252,8 +251,7 @@ export function createJumpURLFetcher(
                 const uri = parseRepoURI(def.uri)
                 return buildURL({
                     repoName: uri.repoName,
-                    commitID: uri.commitID!, // LSP proxy always includes a commitID in the URI.
-                    rev: uri.repoName === repoName && uri.commitID === commitID ? rest.rev : uri.rev!, // If the commitID is the same, keep the rev.
+                    rev: uri.rev!,
                     filePath: uri.filePath!, // There's never going to be a definition without a file.
                     position: def.range
                         ? {
