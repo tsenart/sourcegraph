@@ -1,0 +1,178 @@
+steps:
+  - id: "./dev/check/all.sh"
+    name: "ubuntu"
+    entrypoint: "/bin/bash"
+    args: ["./dev/check/all.sh"]
+# - command:
+#   - dev/ci/yarn-run.sh prettier-check all:tslint all:stylelint all:typecheck graphql-lint
+#   env:
+#     ENTERPRISE: "1"
+#     FORCE_COLOR: "1"
+#     GO111MODULE: "on"
+#     PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: "true"
+#   label: ':lipstick: :lint-roller: :stylelint: :typescript: :graphql:'
+#   plugins:
+#     gopath-checkout#v1.0.1:
+#       import: github.com/sourcegraph/sourcegraph
+# - command:
+#   - dev/ci/yarn-build.sh client/browser
+#   env:
+#     ENTERPRISE: "1"
+#     FORCE_COLOR: "1"
+#     GO111MODULE: "on"
+#     PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: "true"
+#   label: ':ie:'
+#   plugins:
+#     gopath-checkout#v1.0.1:
+#       import: github.com/sourcegraph/sourcegraph
+# - command:
+#   - dev/ci/yarn-build.sh web
+#   env:
+#     ENTERPRISE: "0"
+#     FORCE_COLOR: "1"
+#     GO111MODULE: "on"
+#     NODE_ENV: production
+#     PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: "true"
+#   label: ':webpack:'
+#   plugins:
+#     gopath-checkout#v1.0.1:
+#       import: github.com/sourcegraph/sourcegraph
+# - command:
+#   - dev/ci/yarn-build.sh web
+#   env:
+#     ENTERPRISE: "1"
+#     FORCE_COLOR: "1"
+#     GO111MODULE: "on"
+#     NODE_ENV: production
+#     PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: "true"
+#   label: ':webpack: :moneybag:'
+#   plugins:
+#     gopath-checkout#v1.0.1:
+#       import: github.com/sourcegraph/sourcegraph
+# - artifact_paths: web/coverage/coverage-final.json
+#   command:
+#   - dev/ci/yarn-test.sh web
+#   env:
+#     ENTERPRISE: "1"
+#     FORCE_COLOR: "1"
+#     GO111MODULE: "on"
+#     PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: "true"
+#   label: ':typescript:'
+#   plugins:
+#     gopath-checkout#v1.0.1:
+#       import: github.com/sourcegraph/sourcegraph
+# - artifact_paths: shared/coverage/coverage-final.json
+#   command:
+#   - dev/ci/yarn-test.sh shared
+#   env:
+#     ENTERPRISE: "1"
+#     FORCE_COLOR: "1"
+#     GO111MODULE: "on"
+#     PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: "true"
+#   label: ':typescript:'
+#   plugins:
+#     gopath-checkout#v1.0.1:
+#       import: github.com/sourcegraph/sourcegraph
+# - command:
+#   - ./dev/ci/ci-db-backcompat.sh
+#   env:
+#     ENTERPRISE: "1"
+#     FORCE_COLOR: "1"
+#     GO111MODULE: "on"
+#     PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: "true"
+#   label: ':postgres:'
+#   plugins:
+#     gopath-checkout#v1.0.1:
+#       import: github.com/sourcegraph/sourcegraph
+# - artifact_paths: coverage.txt
+#   command:
+#   - go generate ./...
+#   - go test -coverprofile=coverage.txt -covermode=atomic -race ./...
+#   env:
+#     ENTERPRISE: "1"
+#     FORCE_COLOR: "1"
+#     GO111MODULE: "on"
+#     PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: "true"
+#   label: ':go:'
+#   plugins:
+#     gopath-checkout#v1.0.1:
+#       import: github.com/sourcegraph/sourcegraph
+# - command:
+#   - go generate ./...
+#   - go install -tags dist ./cmd/... ./enterprise/cmd/...
+#   env:
+#     ENTERPRISE: "1"
+#     FORCE_COLOR: "1"
+#     GO111MODULE: "on"
+#     PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: "true"
+#   label: ':go:'
+#   plugins:
+#     gopath-checkout#v1.0.1:
+#       import: github.com/sourcegraph/sourcegraph
+# - command:
+#   - curl -sL -o hadolint "https://github.com/hadolint/hadolint/releases/download/v1.6.5/hadolint-$(uname
+#     -s)-$(uname -m)" && chmod 700 hadolint
+#   - git ls-files | grep Dockerfile | xargs ./hadolint
+#   env:
+#     ENTERPRISE: "1"
+#     FORCE_COLOR: "1"
+#     GO111MODULE: "on"
+#     PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: "true"
+#   label: ':docker:'
+#   plugins:
+#     gopath-checkout#v1.0.1:
+#       import: github.com/sourcegraph/sourcegraph
+# - wait
+# - command:
+#   - buildkite-agent artifact download 'coverage.txt' . || true
+#   - buildkite-agent artifact download '*/coverage-final.json' . || true
+#   - bash <(curl -s https://codecov.io/bash) -X gcov -X coveragepy -X xcode
+#   env:
+#     ENTERPRISE: "1"
+#     FORCE_COLOR: "1"
+#     GO111MODULE: "on"
+#     PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: "true"
+#   label: ':codecov:'
+#   plugins:
+#     gopath-checkout#v1.0.1:
+#       import: github.com/sourcegraph/sourcegraph
+# - wait
+# - command:
+#   - echo "Building frontend..."
+#   - pushd enterprise
+#   - cmd/frontend/pre-build.sh
+#   - go build github.com/sourcegraph/godockerize
+#   - ./godockerize build -t sourcegraph/frontend:26645_2019-01-14_2325cf8 --go-build-flags='-ldflags'
+#     --go-build-flags='-X github.com/sourcegraph/sourcegraph/pkg/version.version=26645_2019-01-14_2325cf8'
+#     --env VERSION=26645_2019-01-14_2325cf8 github.com/sourcegraph/sourcegraph/enterprise/cmd/frontend
+#   - docker push sourcegraph/frontend:26645_2019-01-14_2325cf8
+#   - docker tag sourcegraph/frontend:26645_2019-01-14_2325cf8 sourcegraph/frontend:insiders
+#   - docker push sourcegraph/frontend:insiders
+#   env:
+#     ENTERPRISE: "1"
+#     FORCE_COLOR: "1"
+#     GO111MODULE: "on"
+#     PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: "true"
+#   label: ':docker:'
+#   plugins:
+#     gopath-checkout#v1.0.1:
+#       import: github.com/sourcegraph/sourcegraph
+# - command:
+#   - echo "Building server..."
+#   - pushd enterprise
+#   - cmd/server/pre-build.sh
+#   - cmd/server/build.sh
+#   - docker tag sourcegraph/server:26645_2019-01-14_2325cf8 sourcegraph/server:insiders
+#   - docker push sourcegraph/server:insiders
+#   env:
+#     ENTERPRISE: "1"
+#     FORCE_COLOR: "1"
+#     GO111MODULE: "on"
+#     IMAGE: sourcegraph/server:26645_2019-01-14_2325cf8
+#     PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: "true"
+#     VERSION: 26645_2019-01-14_2325cf8
+#   label: ':docker:'
+#   plugins:
+#     gopath-checkout#v1.0.1:
+#       import: github.com/sourcegraph/sourcegraph
+# - wait
